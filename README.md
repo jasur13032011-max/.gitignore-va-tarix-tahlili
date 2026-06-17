@@ -1,119 +1,152 @@
 # .gitignore-va-tarix-tahlili
-1. Muhitni tayyorlash va Feature Branchlar yaratish
-Avval yangi git ombori (repository) ochamiz va asosiy branchda boshlang'ich nuqtani yaratamiz:
+1. Muhitni sozlash va Git init
+Dastlab, kundalik/ papkasini ochamiz, ichiga kirib Git omborini yaratamiz va asosiy sozlamalarni qilamiz.
 
 Bash
-mkdir git-mashq && cd git-mashq
+mkdir kundalik && cd kundalik
 git init
-echo "Loyiha boshlandi" > readme.md
-git add readme.md
-git commit -m "Initial commit"
-Endi shart bo'yicha 3-4 ta feature branch yaratamiz va ularning ichida 2-3 tadan commit qilamiz.
 
-feature/auth branchini yaratish va commitlar:
-Bash
-git switch -c feature/auth # Yangi branchga o'tish
+# README faylini yaratish
+echo "# Mening Shaxsiy Kundaligim" > README.md
 
-echo "Login funksiyasi" > auth.txt && git add auth.txt && git commit -m "feat: login qo'shildi"
-echo "Register funksiyasi" >> auth.txt && git add auth.txt && git commit -m "feat: register qo'shildi"
-feature/payment branchini yaratish va commitlar:
-main branchga qaytib, yangi branch ochamiz:
+# .gitignore yaratish (va vaqtinchalik .tmp fayllarni ignore qilish)
+echo "*.tmp" > .gitignore
 
-Bash
-git switch main
-git switch -c feature/payment
-
-echo "Payme integratsiyasi" > payment.txt && git add payment.txt && git commit -m "feat: payme qo'shildi"
-echo "Click integratsiyasi" >> payment.txt && git add payment.txt && git commit -m "feat: click qo'shildi"
-feature/ui va feature/chat branchlarini yaratish:
-Bash
-git switch main
-git switch -c feature/ui
-echo "Navbar yaratildi" > ui.txt && git add ui.txt && git commit -m "style: navbar"
-echo "Sidebar yaratildi" >> ui.txt && git add ui.txt && git commit -m "style: sidebar"
-
-git switch main
-git switch -c feature/chat
-echo "Telegram bot ulash" > chat.txt && git add chat.txt && git commit -m "feat: tg bot"
-2. Fast-Forward Merge misoli
-Fast-forward merge — bu main branchda siz feature branch ochganingizdan beri hech qanday o'zgarish bo'lmagan vaziyatda sodir bo'ladi. Git shunchaki main branch ko'rsatkichini oldinga surib qo'yadi.
-
-Keling, feature/auth branchini mainga fast-forward merge qilamiz:
+# Ilk commitni amalga oshirish
+git add README.md .gitignore
+git commit -m "chore: loyiha boshlang'ich nuqtasi (.gitignore va README)"
+2. Shablon yaratish va Feature Branch bilan ishlash
+Kundalik yozuvlari bir xil strukturada bo'lishi uchun shablon yaratamiz.
 
 Bash
-git switch main
-git merge feature/auth
-Konsolda Fast-forward yozuvini ko'rasiz. Hech qanday yangi merge-commit yaratilmaydi.
+mkdir shablonlar
+cat << 'EOF' > shablonlar/kun-shabloni.md
+## 🎯 Kunlik Maqsadlar
+- 
 
-3. 3-Way Merge (Merge Commit) misoli
-Endi vaziyat boshqacha: main branchda o'zgarish bor (chunki boya feature/authni qo'shdik). Lekin biz parallel ravishda yaratilgan feature/payment branchini ham mainga qo'shishimiz kerak. Bu yerda Git tarixlarni solishtirib, 3-way merge algoritmidan foydalanadi va yangi Merge Commit yaratadi.
+## 🐛 Bugun duch kelgan muammolar va xatolar
+- 
 
-Bash
-git switch main
-git merge feature/payment -m "Merge branch 'feature/payment' into main"
-Bu yerda Git ikkala branch tarixini birlashtirib, yangi maxsus commit yaratadi.
+## 💡 Yangi g'oyalar va o'rganilgan narsalar
+- 
 
-4. Branch nomini o'zgartirish (-m)
-Aytaylik, biz ochgan feature/ui branchining nomini standartga moslab feature/design qilib o'zgartirmoqchimiz.
+## 📋 Ertangi kun rejalari
+- 
+EOF
 
-Bash
-# Agar o'sha branchning ichida bo'lsangiz:
-git switch feature/ui
-git branch -m feature/design
-
-# Agar boshqa branchda (masalan, main'da) turgan bo'lsangiz:
-# git branch -m feature/ui feature/design
-5. Ataylab xato: Commit qilinmagan o'zgarishlar bilan branch o'zgartirish
-Siz so'ragan o'sha mashhur xatolikni ataylab keltirib chiqaramiz. feature/design branchida turib, faylga o'zgarish kiritamiz lekin uni commit qilmaymiz:
+git add shablonlar/kun-shabloni.md
+git commit -m "feat: kunlik yozuvlar uchun shablon qo'shildi"
+feature/teglar branchida ishlash
+Kundalikda teglardan foydalanish qoidasini README.mdga qo'shish uchun yangi branch ochamiz:
 
 Bash
-echo "Yangi tugma" >> ui.txt
-# git add yoki commit QILMAYMIZ!
+# Yangi branch ochish va unga o'tish
+git switch -c feature/teglar
 
-# Endi boshqa branchga o'tishga urinamiz:
-git switch main
-Git beradigan xatolik (Error):
+# README.md fayliga teglar bo'limini qo'shish
+cat << 'EOF' >> README.md
 
-error: Your local changes to the following files would be overwritten by checkout: ui.txt
-Please commit your changes or stash them before you switch branches.
+## 🏷 Teglar Tizimi
+Yozuvlarda quyidagi teglardan foydalaniladi:
+- `#shaxsiy` - Shaxsiy hayot va fikrlar
+- `#kodlash` - Dasturlashga oid o'rganishlar
+- `#sport` - Sog'lom turmush tarzi
+EOF
 
-(Buni tuzatish yo'llarini boya aytib o'tganimdek git stash yoki git commit orqali hal qilinadi. Hozircha buni shunday qoldiramiz yoki git stash qilib qo'yamiz).
-
-Bash
-git stash # Xatolikdan qutulish va davom etish uchun
-6. Branch o'chirish (-d xavfsiz va -D majburiy)
--d (Xavfsiz o'chirish):
-Bu buyruq faqatgina main branchga to'liq merge qilingan (birlashtirilgan) branchlarni o'chirishga ruxsat beradi.
+# O'zgarishni saqlash
+git add README.md
+git commit -m "docs: README fayliga teglar tizimi qo'shildi"
+Branch'ni merge qilish va o'chirish
+Endi qilgan ishimizni asosiy (main) branchga birlashtiramiz va ortiqcha branchni o'chiramiz:
 
 Bash
 git switch main
 
-# feature/auth allaqachon merge bo'lgan, shuning uchun muammosiz o'chadi:
-git branch -d feature/auth
--D (Majburiy o'chirish):
-Agar branch mainga merge qilinmagan bo'lsa (masalan, undagi kodlardan voz kechmoqchisiz), Git -d buyrug'i bilan uni o'chirishga yo'l qo'ymaydi. Uni majburlab o'chirish uchun katta -D ishlatiladi.
+# Merj qilish (Bu yerda Fast-forward sodir bo'ladi)
+git merge feature/teglar
 
-Boya biz feature/chat branchini yaratgan edik, lekin uni merge qilmadik. Uni majburiy o'chiramiz:
-
-Bash
-git branch -D feature/chat
-7. git log --graph --all bilan branchlar grafigi
-Loyihamizda hozirgacha nimalar bo'lganini chiroyli va tushunarli grafik ko'rinishida ko'rish uchun quyidagi buyruqni kiritamiz:
+# Branch o'chirildi
+git branch -d feature/teglar
+3. 5 kunlik yozuvlar (8-12 iyun, 2026) va individual commitlar
+Har bir kun uchun alohida fayl yaratamiz va ularni alohida commit qilamiz:
 
 Bash
-git log --graph --oneline --all
-Terminalda taxminan quyidagicha grafik hosil bo'ladi:
+# 8-iyun yozuvi
+cp shablonlar/kun-shabloni.md 2026-06-08.md
+echo "- Bugun Git laboratoriyasini boshladim #kodlash" >> 2026-06-08.md
+git add 2026-06-08.md && git commit -m "docs(daily): 8-iyun yozuvi"
 
-Plaintext
-* e7b2a3f (HEAD -> main) Merge branch 'feature/payment' into main
-|\  
-| * 9a1c4d2 (feature/payment) feat: click qo'shildi
-| * 4f3b2a1 feat: payme qo'shildi
-* | 8c7b6a5 feat: register qo'shildi
-* | 2b1a0f9 feat: login qo'shildi
-|/  
-* a1b2c3d Initial commit
-|
-| * 5e6f7d8 (feature/design) style: sidebar
-| * 1a2b3c4 style: navbar
-Bu grafik tarmoqlar qayerda ajralganini, qayerda qaytadan birlashganini (merge) juda aniq ko'rsatib beradi.
+# 9-iyun yozuvi
+cp shablonlar/kun-shabloni.md 2026-06-09.md
+echo "- Merge va Branchlar bilan ishladim #kodlash" >> 2026-06-09.md
+git add 2026-06-09.md && git commit -m "docs(daily): 9-iyun yozuvi"
+
+# 10-iyun yozuvi
+cp shablonlar/kun-shabloni.md 2026-06-10.md
+echo "- Bugun faqat dam oldim va kitob o'qidim #shaxsiy" >> 2026-06-10.md
+git add 2026-06-10.md && git commit -m "docs(daily): 10-iyun yozuvi"
+
+# 11-iyun yozuvi
+cp shablonlar/kun-shabloni.md 2026-06-11.md
+echo "- Ertalab 5 km yugurdim #sport" >> 2026-06-11.md
+git add 2026-06-11.md && git commit -m "docs(daily): 11-iyun yozuvi"
+
+# 12-iyun yozuvi
+cp shablonlar/kun-shabloni.md 2026-06-12.md
+echo "- Git tarixi tahlili ustida ishlayapman #kodlash" >> 2026-06-12.md
+git add 2026-06-12.md && git commit -m "docs(daily): 12-iyun yozuvi"
+4. git diff bilan o'zgarishlarni tekshirish
+Keling, 8-iyun kundaligiga qo'shimcha kiritamiz va hali commit qilinmagan o'zgarish qanday ko'rinishini tekshiramiz:
+
+Bash
+echo "- Kechki payt Git bo'yicha qo'shimcha maqola o'qidim" >> 2026-06-08.md
+
+# O'zgarishlarni ko'rish
+git diff 2026-06-08.md
+Natija konsolda quyidagicha ko'rinadi:
+
+Diff
+diff --git a/2026-06-08.md b/2026-06-08.md
+index 4b5c6d7..8e9f0a1 100644
+--- a/2026-06-08.md
++++ b/2026-06-08.md
+@@ -9,3 +9,4 @@
+ ## 📋 Ertangi kun rejalari
+ - 
+ - Bugun Git laboratoriyasini boshladim #kodlash
+++ - Kechki payt Git bo'yicha qo'shimcha maqola o'qidim
+(Yashil rangdagi + belgisi yangi qo'shilgan qatorni anglatadi. Keling, buni ham saqlab qo'yamiz):
+
+Bash
+git add 2026-06-08.md
+git commit -m "docs(daily): 8-iyun yozuviga qo'shimcha"
+5. Tarix Tahlili (Statistics & Blame)
+Loyihamizning umumiy holatini tahlil qilamiz.
+
+Jami commitlar sonini aniqlash:
+Bash
+git rev-list --count HEAD
+Hozirgi holatda natija: 9 chiqishi kerak.
+
+Eng katta o'zgarish (qaysi commitda eng ko'p qator qo'shilgan):
+Bizda shablon fayli yaratilganda yoki README tahrirlanganda katta o'zgarish bo'ldi. Statisikani qisqa ko'rish uchun:
+
+Bash
+git log --stat --oneline
+git blame natijasi:
+README.md faylining har bir qatorini kim va qachon yozganini ko'rish uchun:
+
+Bash
+git blame README.md
+Bu buyruq sizga har bir qator yonida commit ID'si va muallif ismini chiqarib beradi.
+
+6. .tmp Ignore Tizimi Ishlashini Tasdiqlash
+.gitignore faylimizga yozilgan *.tmp qoidasi to'g'ri ishlayotganini tekshirish uchun vaqtinchalik fayl yaratib ko'ramiz:
+
+Bash
+echo "Maxfiy yoki keraksiz kesh ma'lumotlar" > kesh-fayli.tmp
+
+# Git holatini tekshiramiz
+git status
+Natija:
+git status buyrug'ini berganingizda, kesh-fayli.tmp fayli "Untracked files" ro'yxatida ko'rinmaydi. Bu .gitignore qoidasi muvaffaqiyatli ishlayotganini va Git uni ataylab hisobga olmayotganini tasdiqlaydi.
