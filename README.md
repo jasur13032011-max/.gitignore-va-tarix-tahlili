@@ -1,29 +1,98 @@
 # .gitignore-va-tarix-tahlili
-85 ballik natijaga erishish uchun hisobot va bajarilgan ish sifatini biroz mukammallashtiramiz. 70 ball odatda faqat texnik bosqichlar bajarilib, jarayonning tahliliy qismi yetarlicha ko'rsatilmaganda beriladi. Maksimal ballga yaqinlashish uchun quyidagi jihatlarga alohida e'tibor qaratish kerak.
+  Mana Git-ning eng foydali va amaliy buyruqlari bo'yicha qulay qo'llanma. Bu buyruqlar kunlik ish unumdorligingizni sezilarli darajada oshiradi.
 
-Yaxshilangan va 85 ball standartiga mos keladigan yakuniy hisobot variantini taqdim etaman:
+1. git stash — Ishni Vaqtincha Saqlash
+git stash sizning joriy o'zgarishlaringizni (commit qilmasdan) alohida xotiraga olib qo'yadi va ishchi katalogni toza (clean) holatga qaytaradi.
 
-Open Source Contribution: Yakuniy Hisobot (85+ Ballik Variant)
-1. Loyiha va Resurslar Linklari
-Tanlangan loyiha (Repo URL): https://github.com/[username]/[repo-nomi] (Faol, 100+ starli va kamida 3 ta "good first issue" tahlil qilingan loyiha)
+Uchta Asosiy Vaziyat:
+Yarim qolgan ish (Work in Progress): Biror funksiya ustida ishlayapsiz, lekin u hali bitmadi. Shu payt shoshilinch boshqa bug-ni to'g'rilashingiz kerak bo'lib qoldi. Kodni chala holatda commit qilmaslik uchun uni git stash qilib turasiz.
 
-Yuborilgan Pull Request (PR URL): https://github.com/[username]/[repo-nomi]/pull/[PR-raqami]
+Pull Conflict (To'qnashuv) oldini olish: Masofaviy serverdan (main branchdan) oxirgi kodlarni tortib olmoqchisiz (git pull), lekin siz joriy fayllarni o'zgartirgansiz. Git sizga pull qilishga ruxsat bermaydi. Shunda kodni stash qilib, pull qilasiz va keyin stash-ni qaytarib olasiz.
 
-2. Jarayonning Batafsil Tahlili va O'z-o'zini Baholash (100 ballik shkala bo'yicha)
-Mezon va Baholash	Ajratilgan Ball	Amaliyotda Qanday Bajarildi? (Hisobot qismi)
-Repo tahlili va saralash	17 / 20	Kamida 3 ta repozitoriyaning good first issue bo'limi ko'rib chiqildi. Loyihaning faolligi (oxirgi commitlar sanasi) va kamida 100+ yulduzchasi borligi tekshirilib, eng mos keladigani tanlab olindi.
-Qoidalarga rioya qilish	18 / 20	Loyihaning CONTRIBUTING.md va CODE_OF_CONDUCT.md fayllari diqqat bilan o'qildi. Kodni formatlash (linter qoidalari) va commit yozish bo'yicha cheklovlar to'liq o'rganildi.
-Git standartlari va Arxitektura	17 / 20	Loyiha GitHub UI orqali fork qilindi. Lokal kompyuterda git remote add upstream buyrug'i bilan original repo bog'landi. main branchda emas, balki muammoga mos docs/fix-typo-... branchida ish olib borildi.
-Commit va PR Sifati	17 / 20	O'zgartirish kiritilgach, Conventional Commits standartida (docs(readme): ... yoki fix(core): ...) xabar yozildi. PR ochishda muammoning mohiyati tushuntirildi va Closes #N kalit so'zi orqali tegishli issue'ga bog'landi.
-Kommunikatsiya va Yakun	16 / 20	Maintainer'ning feedbacklari (agar bo'lsa) sabr bilan ko'rib chiqildi. PR qabul qilingandan so'ng, lokal branch upstream bilan sinxronizatsiya qilinib, ortiqcha branchlar o'chirildi va tozalik saqlandi.
-UMUMIY BAL	85 / 100	Loyiha talablari to'liq va xatolarsiz bajarildi.
-3. Hisobotni Himoya Qilish Uchun Texnik Qaydlar (Siz uchun eslatma)
-Agar ballni yanada oshirmoqchi bo'lsangiz, hisobotingizga quyidagi 3 ta aniq faktni qo'shib qo'ying:
+Eksperiment (Tajriba): Kodga biror yangilik qo'shib ko'rmoqchisiz, lekin u o'xshamasligi mumkin. Uni vaqtincha stash-ga olib, toza kodda boshqa narsani sinab ko'rsangiz bo'ladi.
 
-Qaysi 3 ta reponi tahlil qilganingiz: Masalan: "Dastlab repo-A va repo-B ko'rib chiqildi, biroq ulardagi issuellar eskirgani sababli, faol bo'lgan repo-C tanlandi."
+Boshqarish Buyruqlari:
+git stash list — Saqlangan barcha stash-lar ro'yxatini ko'rsatadi (masalan: stash@{0}, stash@{1}).
 
-Kiritilgan aniq o'zgarish: PR ichida aynan nimani tuzatganingizni qisqa (1 ta gapda) yozing.
+git stash apply — Eng oxirgi saqlangan stash-ni ishchi katalogga qaytaradi, lekin uni stash ro'yxatidan o'chirib tashlamaydi.
 
-Sinxronizatsiya buyrug'i: Git bilan ishlashda git fetch upstream va git merge upstream/main qismlarini bajarganingizni alohida ta'kidlang.
+git stash pop — Eng oxirgi stash-ni qaytaradi va uni ro'yxatdan o'chirib yuboradi (eng ko'p ishlatiladigan usul).
 
-Ushbu strukturada tayyorlangan hisobot 85 ballik normativdan muammosiz o'tadi.
+git stash drop — Keraksiz bo'lgan stash-ni ro'yxatdan butunlay o'chirib tashlaydi.
+
+Maxsus Holatlar:
+git stash -u (yoki --include-untracked) — Git hali kuzatishni boshlamagan (yangi yaratilgan, git add qilinmagan) untracked fayllarni ham stash ichiga qo'shib saqlaydi. Oddiy git stash bularni saqlamaydi.
+
+git stash branch <branch_nomi> — Stash ichidagi o'zgarishlar bilan to'g'ridan-to'g'ri yangi branch ochadi va stash-ni o'chiradi. Bu stash-ni qaytarganda juda ko'p konflikt chiqsa juda asqotadi.
+
+2. git cherry-pick — Kerakli Commit-ni Ko'chirib O'tish
+Boshqa bir branch-dagi tayyor commit-ni o'zingiz turgan joriy branch-ga nusxalab o'tkazish uchun ishlatiladi.
+
+Bitta commit-ni olish:
+
+Bash
+git cherry-pick <commit_hash>
+Bir nechta commit-larni olish:
+
+Bash
+git cherry-pick <commit_hash1> <commit_hash2> <commit_hash3>
+Ketma-ket kelgan commit-lar oralig'ini olish uchun: git cherry-pick <eski_hash>..<yangi_hash>
+
+Cherry-pick Conflict Yechish:
+Agar nusxalanayotgan commit joriy branch kodi bilan to'qnashsa (conflict), Git jarayonni to'xtatadi. Uni yechish tartibi:
+
+Konflikt bor fayllarni ochib, kodni tartibga soling.
+
+Fayllarni saqlab, git add <fayl_nomi> qiling.
+
+Jarayonni davom ettirish uchun quyidagini yozing:
+
+Bash
+git cherry-pick --continue
+(Agar cherry-pick-ni bekor qilmoqchi bo'lsangiz: git cherry-pick --abort)
+
+3. git commit --amend — Oxirgi Commit-ni O'zgartirish
+Eng oxirgi qilingan commit-ga tuzatish kiritish uchun ishlatiladi.
+
+Commit xabarini tahrirlash: Oxirgi commit xabarida xato qilib qo'ysangiz, uni qayta yozish imkonini beradi:
+
+Bash
+git commit --amend -m "Yangi va to'g'ri commit xabari"
+Yangi fayl qo'shish (--no-edit): Biror fayl commit-ga qo'shilmay qolib ketgan bo'lsa, uni git add qilib, so'ng commit xabarini o'zgartirmasdan oxirgi commit-ga qo'shib yuborish mumkin:
+
+Bash
+git add unutilgan_fayl.txt
+git commit --amend --no-edit
+⚠️ Push Qilingan Commit-da Amend Xavfi:
+Muhim qoida: Agar siz commit-ni masofaviy serverga (git push qilib) yuborgan bo'lsangiz, uni lokalda --amend qilmaslik kerak.
+
+--amend buyrug'i eski commit-ni shunchaki tahrirlamaydi, balki uni o'chirib, yangi ID (hash) bilan yangi commit yaratadi. Agar buni push qilsangiz, Git tarix buzilgani haqida xato beradi. Uni majburlab push qilish (git push --force) esa jamoadagi boshqa dasturchilarning kodlarida jiddiy chalkashlik va to'qnashuvlarga (conflict) olib keladi.
+
+4. 6 ta Foydali Git Alias (Tezkor Buyruqlar)
+Git-da uzoq buyruqlarni qisqartirish uchun quyidagi alias-larni terminalda bir marta ishga tushirib sozlab oling:
+
+git st — Holatni qisqa va tushunarli ko'rish:
+
+Bash
+git config --global alias.st "status -s"
+git co — Branch-lar aro tez almashish:
+
+Bash
+git config --global alias.co checkout
+git cm — Xabar bilan tezkor commit qilish:
+
+Bash
+git config --global alias.cm "commit -m"
+git br — Branch-lar ro'yxatini ko'rish:
+
+Bash
+git config --global alias.br branch
+git lg — Commit-lar tarixini chiroyli, rangli va grafik shaklda ko'rish (juda foydali!):
+
+Bash
+git config --global alias.lg "log --oneline --graph --decorate --all"
+git unstage — git add qilingan faylni commit ro'yxatidan qaytarib chiqarish:
+
+Bash
+git config --global alias.unstage "restore --staged"
+Endi siz git status o'rniga shunchaki git st, yoki chiroyli log ko'rish uchun git lg buyruqlaridan foydalanishingiz mumkin.
