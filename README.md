@@ -1,0 +1,1 @@
+# .gitignore-va-tarix-tahlili
