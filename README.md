@@ -1,169 +1,119 @@
 # .gitignore-va-tarix-tahlili
-Tushundim, demak, yanada mukammalroq va "100 ballik" formatda, ya'ni xuddi professional dasturchilar ishlatadigan eng yuqori sifat standarti (Best Practices) bo'yicha tayyorlaymiz.
-
-Quyida har bir punkt mukammal tushuntirish, real misollar va eng muhim lifehack-lar bilan batafsil yoritilgan.
-
-1. Professional va Moslashuvchan .gitignore
-Haqiqiy loyihalarda .gitignore fayliga nafaqat til keshlarini, balki IDE (kod tahrirlovchilari) va operatsion tizim fayllarini ham qo'shish shart.
-
-🐍 Python uchun (Production-ready .gitignore):
-Plaintext
-# --- VIRTUAL ENVIRONMENT ---
-venv/
-.venv/
-env/
-ENV/
-pyenv/
-
-# --- PYTHON CACHE & COMPILED ---
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-
-# --- JUPYTER NOTEBOOK ---
-.ipynb_checkpoints
-
-# --- ENVIRONMENT VARIABLES & SECRETS ---
-.env
-.env.[a-zA-Z]*
-!.env.example
-
-# --- IDEs & EDITORS ---
-.vscode/
-.idea/
-*.suo
-*.ntvs*
-🟢 Node.js uchun (Production-ready .gitignore):
-Plaintext
-# --- DEPENDENCIES ---
-node_modules/
-jspm_packages/
-
-# --- BUILD & OUTPUT ---
-dist/
-build/
-.next/
-.nuxt/
-out/
-
-# --- LOGS ---
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# --- SECRETS ---
-.env
-.env.local
-.env.development.local
-!.env.example
-
-# --- OS & IDE ---
-.DS_Store
-.vscode/
-Pro Tip: Har doim loyihada .env.example faylini qoldiring. Ichiga maxfiy kalitlarni o'zini emas, shunchaki nomlarini yozib qo'ying (Masalan: DB_HOST=example.com). Shunda boshqa dasturchilar loyihani yuklab olganda qanday o'zgaruvchilar kerakligini bilishadi.
-
-2. .env Yaratish va Uni "Invisible" (Ko'rinmas) Qilish
-.env fayli yaratilgandan keyin u Git statusida mutlaqo ko'rinmasligi kerak. Buning uchun "Step-by-Step" laboratoriya ishi:
+1. Muhitni tayyorlash va Feature Branchlar yaratish
+Avval yangi git ombori (repository) ochamiz va asosiy branchda boshlang'ich nuqtani yaratamiz:
 
 Bash
-# 1. Loyiha papkasini oching va uning ichida .env yarating
-echo "SECRET_KEY=super_secure_100_ball" > .env
+mkdir git-mashq && cd git-mashq
+git init
+echo "Loyiha boshlandi" > readme.md
+git add readme.md
+git commit -m "Initial commit"
+Endi shart bo'yicha 3-4 ta feature branch yaratamiz va ularning ichida 2-3 tadan commit qilamiz.
 
-# 2. .gitignore faylini ochib unga .env so'zini qo'shing
-echo ".env" >> .gitignore
+feature/auth branchini yaratish va commitlar:
+Bash
+git switch -c feature/auth # Yangi branchga o'tish
 
-# 3. Git holatini tekshiramiz
-git status
-Kutilayotgan Natija (100 ballik holat):
-Terminalda Untracked files bo'limida faqat .gitignore chiqishi kerak. Agar u yerda .env ham turgan bo'lsa, demak .gitignore fayliga nomini noto'g'ri yozgansiz yoki fayl formati xato.
-
-3. Global .gitignore_global Sozlash (Butun Tizim Uchun)
-Har bir loyihada .DS_Store (macOS) yoki Thumbs.db (Windows) kabi operatsion tizim fayllarini yozib o'tirmaslik uchun ularni bir marta global darajada chetlab o'tamiz.
+echo "Login funksiyasi" > auth.txt && git add auth.txt && git commit -m "feat: login qo'shildi"
+echo "Register funksiyasi" >> auth.txt && git add auth.txt && git commit -m "feat: register qo'shildi"
+feature/payment branchini yaratish va commitlar:
+main branchga qaytib, yangi branch ochamiz:
 
 Bash
-# 1. Global ignore faylini uy katalogida (home) yaratamiz
-touch ~/.gitignore_global
+git switch main
+git switch -c feature/payment
 
-# 2. Unga tizim fayllarini yozamiz
-echo ".DS_Store" >> ~/.gitignore_global
-echo "Thumbs.db" >> ~/.gitignore_global
-echo ".vscode/" >> ~/.gitignore_global
+echo "Payme integratsiyasi" > payment.txt && git add payment.txt && git commit -m "feat: payme qo'shildi"
+echo "Click integratsiyasi" >> payment.txt && git add payment.txt && git commit -m "feat: click qo'shildi"
+feature/ui va feature/chat branchlarini yaratish:
+Bash
+git switch main
+git switch -c feature/ui
+echo "Navbar yaratildi" > ui.txt && git add ui.txt && git commit -m "style: navbar"
+echo "Sidebar yaratildi" >> ui.txt && git add ui.txt && git commit -m "style: sidebar"
 
-# 3. Git tizimiga ushbu faylni global qoida sifatida tanitamiz
-git config --global core.excludesfile ~/.gitignore_global
-Tekshirish: git config --global --list buyrug'ini bersangiz, ro'yxatda core.excludesfile paydo bo'ladi.
+git switch main
+git switch -c feature/chat
+echo "Telegram bot ulash" > chat.txt && git add chat.txt && git commit -m "feat: tg bot"
+2. Fast-Forward Merge misoli
+Fast-forward merge — bu main branchda siz feature branch ochganingizdan beri hech qanday o'zgarish bo'lmagan vaziyatda sodir bo'ladi. Git shunchaki main branch ko'rsatkichini oldinga surib qo'yadi.
 
-4. git diff Master Klass: Uch Xil Variant
-git diff – kod o'zgarishlarini mikroskop ostida ko'rish vositasidir. Ularning farqini rasmdek tasavvur qiling:
-
-Buyruq	Nimani nimaga solishtiradi?	Qachon ishlatiladi?
-git diff	Working Directory 🆚 Staged (Index)	git add qilishdan oldin, "nimalarni o'zgartirdim o'zi?" deb tekshirish uchun.
-git diff --staged
-
-
-(yoki --cached)
-
-Staged (Index) 🆚 Oxirgi Commit (HEAD)	git add qilib bo'lgach, commit qilishdan oldin oxirgi tekshirish uchun.
-git diff HEAD	Working Directory 🆚 Oxirgi Commit (HEAD)	git add qilingan va qilinmagan barcha o'zgarishlarni umumiy ko'rish uchun.
-5. Grafik ko'rinishdagi Log uchun Premium Alias
-Standart git log juda uzun va o'qishga noqulay. Loyiha tarmoqlari (branches) qayerga qarab ketayotganini ko'rish uchun eng chiroyli kombinatsiyani doimiy qisqartmaga aylantiramiz:
+Keling, feature/auth branchini mainga fast-forward merge qilamiz:
 
 Bash
-git config --global alias.tree "log --graph --oneline --all --decorate"
-Bu nima beradi?
-Endi istalgan loyihada git tree deb yozsangiz, terminalda xuddi mana bunday chiroyli grafik vizualizatsiya chiqadi:
+git switch main
+git merge feature/auth
+Konsolda Fast-forward yozuvini ko'rasiz. Hech qanday yangi merge-commit yaratilmaydi.
+
+3. 3-Way Merge (Merge Commit) misoli
+Endi vaziyat boshqacha: main branchda o'zgarish bor (chunki boya feature/authni qo'shdik). Lekin biz parallel ravishda yaratilgan feature/payment branchini ham mainga qo'shishimiz kerak. Bu yerda Git tarixlarni solishtirib, 3-way merge algoritmidan foydalanadi va yangi Merge Commit yaratadi.
+
+Bash
+git switch main
+git merge feature/payment -m "Merge branch 'feature/payment' into main"
+Bu yerda Git ikkala branch tarixini birlashtirib, yangi maxsus commit yaratadi.
+
+4. Branch nomini o'zgartirish (-m)
+Aytaylik, biz ochgan feature/ui branchining nomini standartga moslab feature/design qilib o'zgartirmoqchimiz.
+
+Bash
+# Agar o'sha branchning ichida bo'lsangiz:
+git switch feature/ui
+git branch -m feature/design
+
+# Agar boshqa branchda (masalan, main'da) turgan bo'lsangiz:
+# git branch -m feature/ui feature/design
+5. Ataylab xato: Commit qilinmagan o'zgarishlar bilan branch o'zgartirish
+Siz so'ragan o'sha mashhur xatolikni ataylab keltirib chiqaramiz. feature/design branchida turib, faylga o'zgarish kiritamiz lekin uni commit qilmaymiz:
+
+Bash
+echo "Yangi tugma" >> ui.txt
+# git add yoki commit QILMAYMIZ!
+
+# Endi boshqa branchga o'tishga urinamiz:
+git switch main
+Git beradigan xatolik (Error):
+
+error: Your local changes to the following files would be overwritten by checkout: ui.txt
+Please commit your changes or stash them before you switch branches.
+
+(Buni tuzatish yo'llarini boya aytib o'tganimdek git stash yoki git commit orqali hal qilinadi. Hozircha buni shunday qoldiramiz yoki git stash qilib qo'yamiz).
+
+Bash
+git stash # Xatolikdan qutulish va davom etish uchun
+6. Branch o'chirish (-d xavfsiz va -D majburiy)
+-d (Xavfsiz o'chirish):
+Bu buyruq faqatgina main branchga to'liq merge qilingan (birlashtirilgan) branchlarni o'chirishga ruxsat beradi.
+
+Bash
+git switch main
+
+# feature/auth allaqachon merge bo'lgan, shuning uchun muammosiz o'chadi:
+git branch -d feature/auth
+-D (Majburiy o'chirish):
+Agar branch mainga merge qilinmagan bo'lsa (masalan, undagi kodlardan voz kechmoqchisiz), Git -d buyrug'i bilan uni o'chirishga yo'l qo'ymaydi. Uni majburlab o'chirish uchun katta -D ishlatiladi.
+
+Boya biz feature/chat branchini yaratgan edik, lekin uni merge qilmadik. Uni majburiy o'chiramiz:
+
+Bash
+git branch -D feature/chat
+7. git log --graph --all bilan branchlar grafigi
+Loyihamizda hozirgacha nimalar bo'lganini chiroyli va tushunarli grafik ko'rinishida ko'rish uchun quyidagi buyruqni kiritamiz:
+
+Bash
+git log --graph --oneline --all
+Terminalda taxminan quyidagicha grafik hosil bo'ladi:
 
 Plaintext
-* 7b3a2f1 (HEAD -> main, origin/main) Fix: .env file ignored
-* | d4e2a1b Feature: added database connection
-| * c1b2a3f (dev) Feature: auth system implementation
-|/
+* e7b2a3f (HEAD -> main) Merge branch 'feature/payment' into main
+|\  
+| * 9a1c4d2 (feature/payment) feat: click qo'shildi
+| * 4f3b2a1 feat: payme qo'shildi
+* | 8c7b6a5 feat: register qo'shildi
+* | 2b1a0f9 feat: login qo'shildi
+|/  
 * a1b2c3d Initial commit
-6. git blame – "Kim Aybdor?" Buyrug'i
-Koddagi xatolikni kim va qaysi commitda qilganini sekundiga aniqlash:
-
-Bash
-git blame src/index.js
-Natijada terminalda har bir qator oldidan mana bunday ma'lumot chiqadi:
-
-Plaintext
-e92a4f1c (Diyorbek  2026-06-15 14:20:01 +0500  12) const db = connect();
-e92a4f1c — Commit ID.
-
-Diyorbek — Qatorni yozgan muallif.
-
-2026-06-15 — O'zgartirilgan sana.
-
-12 — Fayldagi qator raqami.
-
-7. git log -S 'soz' (Kodni Ichidan Qidiruv)
-Loyiha juda katta bo'lsa va siz ma'lum bir funksiya yoki so'z (masalan, getUsers) tarixda qachon paydo bo'lganini yoki o'chib ketganini bilmoqchi bo'lsangiz:
-
-Bash
-git log -S "getUsers" --oneline --format="%h - %an, %ar : %s"
-Natija:
-
-Plaintext
-a1c2e3f - Eshmat, 3 days ago : Delete old getUsers function
-b5f6g7h - Toshmat, 2 weeks ago : Add getUsers API integration
-Bu buyruq fayllarni emas, kodning aynan ichidagi tekst o'zgarishlarini qidiradi.
-
-8. Allaqachon Kuzatuvga tushgan Faylni O'chirish (git rm --cached)
-Eng ko'p beriladigan xato: .env faylini oldin commit qilib yuborishgan, keyin .gitignorega qo'shishgan, lekin fayl hali ham Git-da ko'rinaveradi. Uni xavfsiz tozalash algoritmi:
-
-Bash
-# 1. Faylni faqat Git keshidan (indeksidan) o'chirish (Kompyuterdan o'chmaydi!)
-git rm --cached .env
-
-# 2. Agar butun bir papkani (masalan, noto'g'ri ketgan node_modules-ni) keshdan olmoqchi bo'lsangiz:
-git rm -r --cached node_modules/
-
-# 3. .gitignore fayliga o'sha fayl/papka nomi yozilganini tekshiring
-echo ".env" >> .gitignore
-
-# 4. Git keshni yangilashi uchun darhol commit qiling
-git add .gitignore
-git commit -m "Git tracking removed for .env file"
-Shu bilan fayl Git tarixida (muzeyda) qoladi, lekin yangi o'zgarishlari endi umuman kuzatilmaydi.
+|
+| * 5e6f7d8 (feature/design) style: sidebar
+| * 1a2b3c4 style: navbar
+Bu grafik tarmoqlar qayerda ajralganini, qayerda qaytadan birlashganini (merge) juda aniq ko'rsatib beradi.
