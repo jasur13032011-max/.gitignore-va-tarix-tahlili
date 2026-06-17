@@ -1,108 +1,86 @@
 # .gitignore-va-tarix-tahlili
-Lokal kompyuterdagi Git omborini GitHub masofaviy (remote) serveri bilan bog'lash, xavfsiz ulanish (SSH) o'rnatish va kodlarni sinxronizatsiya qilish bo'yicha to'liq va ketma-ket qo'llanma.
+GitHub'da Pull Request (PR) bilan professional darajada ishlash, loyiha ustida jamoaviy kod yozish va review (ko'rib chiqish) jarayonining yuragi hisoblanadi.
 
-1. SSH Kalit Yaratish va GitHub'ga Qo'shish
-Parol kiritib o'tirmaslik va xavfsiz aloqa o'rnatish uchun SSH kalitidan foydalanamiz.
+Keling, barcha buyruqlar va GitHub interfeysidagi harakatlarni qadamma-qadam ko'rib chiqamiz.
 
-SSH kalit yaratish
-Terminalingizni oching va quyidagi buyruqni kiriting (elektron pochtangizni yozing):
-
-Bash
-ssh-keygen -t ed25519 -C "sizning_pochtangiz@example.com"
-Tizim sizdan kalitni qayerga saqlashni va parol (passphrase) qo'yishni so'raydi. Hammasiga shunchaki Enter bosing.
-
-Public key (ommaviy kalit)ni nusxalash
-Yaratilgan maxfiy kalitning ommaviy qismini GitHub'ga berishimiz kerak. Uni ko'rish uchun:
+1. Feature Branch va Birinchi Commitlar
+Avval lokal kompyuterimizda yangi branch ochib, bir nechta commit qilamiz. Commit xabarlarini tushunarli va standart formatda (Conventional Commits) yozamiz.
 
 Bash
-# Mac/Linux foydalanuvchilari uchun:
-cat ~/.ssh/id_ed25519.pub
+# Yangi branch ochish va unga o'tish
+git switch -c feature/user-profile
 
-# Windows (Git Bash) foydalanuvchilari uchun:
-cat ~/.ssh/id_ed25519.pub
-Ekrandagi ssh-ed25519 ... bilan boshlanadigan barcha matnni nusxalab oling (Copy).
+# 1-commit: Profil sahifasi strukturasi
+echo "<div>Profil Sahifasi</div>" > profile.html
+git add profile.html
+git commit -m "feat(profile): foydalanuvchi profili uchun asosiy sahifa yaratildi"
 
-GitHub'ga qo'shish
-GitHub saytiga kiring va profil rasmingizni bosib, Settings bo'limiga o'ting.
-
-Chap menyudan SSH and GPG keys bo'limini tanlang.
-
-New SSH key tugmasini bosing.
-
-Title qismiga kompyuteringiz nomini yozing (masalan: Dasturchi-Noutbuki).
-
-Key qismiga nusxalangan matnni joylashtiring (Paste) va Add SSH key tugmasini bosing.
-
-Aloqani tasdiqlash
-Ulanish muvaffaqiyatli bo'lganini tekshirish uchun terminalda quyidagini ishlating:
+# 2-commit: Avatar yuklash qismi
+echo "<input type='file' />" >> profile.html
+git add profile.html
+git commit -m "feat(profile): foydalanuvchiga avatar rasm yuklash imkoniyati qo'shildi"
+2. Branch'ni GitHub'ga Push qilish
+Branch faqat sizning kompyuteringizda turibdi. Uni GitHub serverida ham yaratib, kodni yuborish uchun:
 
 Bash
-ssh -T git@github.com
-Sizdan so'rov so'ralsa yes deb yozing. Agar hammasi to'g'ri bo'lsa, quyidagi xabarni ko'rasiz:
+git push -u origin feature/user-profile
+3. GitHub UI orqali Pull Request (PR) Yaratish
+GitHub sahifangizga kirsangiz, tepada sariq rangda "Compare & pull request" tugmasi paydo bo'ladi. Uni bosing va quyidagilarni to'ldiring:
 
-Hi [Sizning-Loginingiz]! You've successfully authenticated, but GitHub does not provide shell access.
+PR Title (Sarlavha): feat(profile): add user profile page with avatar upload (Conventional Commit formatida).
 
-2. GitHub'da Yangi Repo ochish va Lokal Reponi Ulash
-GitHub bosh sahifasiga o'ting va New (yoki Create repository) tugmasini bosing.
+PR Description (Tavsif): PR nima ish qilishi va qaysi masalani (Issue) yopishi haqida yoziladi.
 
-Repository nomini yozing (masalan: kundalik).
+Markdown
+### Nima ish qilindi?
+- Foydalanuvchi ma'lumotlarini ko'rsatuvchi sahifa yaratildi.
+- Avatar yuklash uchun input elementi qo'shildi.
 
-DIQQAT: Add a README file, Add .gitignore bo'limlariga mutlaqo tegib o'tirmang (ular belgilangan bo'lsa, olib tashlang). Repo butunlay bo'sh bo'lishi kerak.
+### Skrinshotlar (Screenshots)
+![Profil Sahifasi](https://github-storage.com/rasm.png)
 
-Create repository tugmasini bosing.
+Closes #12
+Muhim: Closes #12 (yoki Fixes #12) yozuvi PR asosiy branchga merge bo'lishi bilan 12-raqamli Issue'ni avtomatik ravishda yopib yuboradi.
 
-Sizga GitHub tomonidan SSH manzili beriladi (u git@github.com:login/repo.git ko'rinishida bo'ladi).
-
-Lokal reponi GitHub'ga bog'lash
-O'zingizning kompyuteringizdagi loyiha papkasiga (kundalik/) kirib, masofaviy server manzilini qo'shing:
-
-Bash
-# Masofaviy server manzilini 'origin' nomi bilan saqlash
-git remote add origin git@github.com:SIZNING_LOGIN/REPOS_NOMI.git
-
-# Birinchi marta push qilish (Lokal main branchini GitHub'ga bog'lash)
-git push -u origin main
--u (upstream) flagi bir marta yoziladi. Keyingi safar Git qayerga push qilishni o'zi eslab qoladi.
-
-3. Kundalik Ish Oqimi (Workflow) va Qisqartirilgan Push
-Endi loyihada biror o'zgarish qilamiz:
+4. gh CLI (Terminal) orqali PR Yaratish
+Agar ishingizni brauzerga o'tmasdan, terminalning o'zida bitirmoqchi bo'lsangiz, GitHub CLI (gh) vositasidan foydalanishingiz mumkin:
 
 Bash
-echo "- Bugun GitHub bilan ishlashni o'rgandim" >> README.md
-git add README.md
-git commit -m "docs: bugungi o'rganishlar yozildi"
-Endi -u flagisiz, shunchaki qisqa buyruq orqali kodni GitHub'ga yuboramiz:
+# Terminal orqali to'g'ridan-to'g'ri PR ochish
+gh pr create --title "feat(profile): add user profile page" --body "Closes #12" --web
+--web flagi sizga tayyor PR sahifasini brauzerda ochib beradi.
+
+5. Draft PR (Xomaki PR) nima?
+Agar kodingiz hali to'liq tayyor bo'lmasa, lekin boshqa hamkasblaringizga hozircha qanday kod yozayotganingizni ko'rsatib turmoqchi bo'lsangiz, Draft PR ochasiz.
+
+Qanday ochiladi? GitHub UI'da "Create pull request" tugmasining yonidagi strelkani bosib, "Create draft pull request" tanlanadi.
+
+Xususiyati: Uni hech kim tasodifan main branchga merge qilib yubora olmaydi. Tayyor bo'lganidan keyin "Ready for review" tugmasini bosib, uni oddiy PR holatiga o'tkazish mumkin.
+
+6. PR'larni ko'rish va boshqarish (CLI commands)
+Terminal orqali barcha faol PR'larni ko'rish va tekshirish:
 
 Bash
-git push
-4. Loyihani Boshqa Joyga Clone Qilish va Pull Olish
-Tasavvur qiling, siz uydagi kompyuterda ishni tugatdingiz va ofisdagi boshqa kompyuterda loyihani davom ettirmoqchisiz.
+# Loyihadagi barcha ochiq PR'lar ro'yxatini ko'rish
+gh pr list
 
-Clone (Nusxa olish)
-Boshqa ixtiyoriy papkaga o'tib, loyihani butunlay ko'chirib olasiz:
+# Joriy PR'ni brauzerda ochib ko'rish
+gh pr view --web
+7. Kodni Tasdiqlash (Approve) va 3 xil Merge Strategiyasi
+Odatda jamoada boshqa dasturchi sizning kodingizni tekshirib, Approve bosadi. Agar loyiha egasi o'zingiz bo'lsangiz, to'g'ridan-to'g'ri merge qilishga o'tasiz. GitHub merge qilish uchun 3 xil tugma taklif qiladi:
 
-Bash
-git clone git@github.com:SIZNING_LOGIN/REPOS_NOMI.git
-Bu buyruq loyihaning barcha fayllari va Git tarixini yangi papka qilib yuklab beradi.
-
-Pull (Yangiliklarni olish)
-Agar loyiha kompyuteringizda allaqachon bor bo'lsa-yu, lekin GitHub'da kimdir (yoki o'zingiz boshqa joydan) yangi commit qo'shgan bo'lsa, o'sha o'zgarishlarni kompyuterga yuklash uchun foydalaniladi:
-
-Bash
-git pull
-5. Feature Branch Yaratish va Masofaviy Serverga Push Qilish
-Yangi vazifa ustida ishlash uchun lokal kompyuterda yangi branch ochamiz:
+Strategiya nomi	Qanday ishlaydi?	Qachon ishlatiladi?
+Create a merge commit	Feature branchdagi barcha commitlarni va alohida "Merge commit"ni tarixga qo'shadi.	Tarmoqlar tarixi to'liq saqlanib qolishi kerak bo'lganda.
+Squash and merge 🌟	Feature branchdagi 2-3 ta mayda commitlarni bitta yagona commitga birlashtirib mainga qo'shadi.	Tavsiya etiladi! main branch tarixi toza va tushunarli bo'lib qoladi.
+Rebase and merge	Feature branchdagi commitlarni main branchning eng uchiga bittalab ko'chirib o'tkazadi (merge commit yaratmaydi).	Tarix chiziqli (linear) bo'lishi talab etilganda.
+8. Branchlarni Butunlay O'chirish
+PR muvaffaqiyatli merge bo'lgandan keyin, endi u branchga ehtiyoj qolmaydi. Uni har ikki joydan ham o'chirib tashlaymiz:
 
 Bash
-# Yangi feature branch yaratish va unga o'tish
-git switch -c feature/profile
+# 1. Masofaviy serverdagi (GitHub) branchni o'chirish
+git push origin --delete feature/user-profile
 
-# Biror o'zgarish qilish
-echo "Foydalanuvchi profili bo'limi" > profile.md
-git add profile.md
-git commit -m "feat: profil sahifasi asosi yaratildi"
-Ushbu branch faqat bizning kompyuterimizda mavjud. Uni GitHub serverida ham ochish va kodni yuborish uchun quyidagi buyruqni bajaramiz:
-
-Bash
-git push -u origin feature/profile
-Endi GitHub saytiga kirsangiz, u yerda ikkita branch (main va feature/profile) paydo bo'lganini va jamoangiz siz yozgan kodni ko'rib chiqishi (Pull Request) mumkinligini ko'rasiz.
+# 2. Lokal kompyuterimizdagi branchni o'chirish (avval main'ga o'tamiz)
+git switch main
+git pull origin main  # Yangilangan main kodini olish
+git branch -d feature/user-profile
