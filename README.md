@@ -1,152 +1,108 @@
 # .gitignore-va-tarix-tahlili
-1. Muhitni sozlash va Git init
-Dastlab, kundalik/ papkasini ochamiz, ichiga kirib Git omborini yaratamiz va asosiy sozlamalarni qilamiz.
+Lokal kompyuterdagi Git omborini GitHub masofaviy (remote) serveri bilan bog'lash, xavfsiz ulanish (SSH) o'rnatish va kodlarni sinxronizatsiya qilish bo'yicha to'liq va ketma-ket qo'llanma.
+
+1. SSH Kalit Yaratish va GitHub'ga Qo'shish
+Parol kiritib o'tirmaslik va xavfsiz aloqa o'rnatish uchun SSH kalitidan foydalanamiz.
+
+SSH kalit yaratish
+Terminalingizni oching va quyidagi buyruqni kiriting (elektron pochtangizni yozing):
 
 Bash
-mkdir kundalik && cd kundalik
-git init
+ssh-keygen -t ed25519 -C "sizning_pochtangiz@example.com"
+Tizim sizdan kalitni qayerga saqlashni va parol (passphrase) qo'yishni so'raydi. Hammasiga shunchaki Enter bosing.
 
-# README faylini yaratish
-echo "# Mening Shaxsiy Kundaligim" > README.md
-
-# .gitignore yaratish (va vaqtinchalik .tmp fayllarni ignore qilish)
-echo "*.tmp" > .gitignore
-
-# Ilk commitni amalga oshirish
-git add README.md .gitignore
-git commit -m "chore: loyiha boshlang'ich nuqtasi (.gitignore va README)"
-2. Shablon yaratish va Feature Branch bilan ishlash
-Kundalik yozuvlari bir xil strukturada bo'lishi uchun shablon yaratamiz.
+Public key (ommaviy kalit)ni nusxalash
+Yaratilgan maxfiy kalitning ommaviy qismini GitHub'ga berishimiz kerak. Uni ko'rish uchun:
 
 Bash
-mkdir shablonlar
-cat << 'EOF' > shablonlar/kun-shabloni.md
-## 🎯 Kunlik Maqsadlar
-- 
+# Mac/Linux foydalanuvchilari uchun:
+cat ~/.ssh/id_ed25519.pub
 
-## 🐛 Bugun duch kelgan muammolar va xatolar
-- 
+# Windows (Git Bash) foydalanuvchilari uchun:
+cat ~/.ssh/id_ed25519.pub
+Ekrandagi ssh-ed25519 ... bilan boshlanadigan barcha matnni nusxalab oling (Copy).
 
-## 💡 Yangi g'oyalar va o'rganilgan narsalar
-- 
+GitHub'ga qo'shish
+GitHub saytiga kiring va profil rasmingizni bosib, Settings bo'limiga o'ting.
 
-## 📋 Ertangi kun rejalari
-- 
-EOF
+Chap menyudan SSH and GPG keys bo'limini tanlang.
 
-git add shablonlar/kun-shabloni.md
-git commit -m "feat: kunlik yozuvlar uchun shablon qo'shildi"
-feature/teglar branchida ishlash
-Kundalikda teglardan foydalanish qoidasini README.mdga qo'shish uchun yangi branch ochamiz:
+New SSH key tugmasini bosing.
+
+Title qismiga kompyuteringiz nomini yozing (masalan: Dasturchi-Noutbuki).
+
+Key qismiga nusxalangan matnni joylashtiring (Paste) va Add SSH key tugmasini bosing.
+
+Aloqani tasdiqlash
+Ulanish muvaffaqiyatli bo'lganini tekshirish uchun terminalda quyidagini ishlating:
 
 Bash
-# Yangi branch ochish va unga o'tish
-git switch -c feature/teglar
+ssh -T git@github.com
+Sizdan so'rov so'ralsa yes deb yozing. Agar hammasi to'g'ri bo'lsa, quyidagi xabarni ko'rasiz:
 
-# README.md fayliga teglar bo'limini qo'shish
-cat << 'EOF' >> README.md
+Hi [Sizning-Loginingiz]! You've successfully authenticated, but GitHub does not provide shell access.
 
-## 🏷 Teglar Tizimi
-Yozuvlarda quyidagi teglardan foydalaniladi:
-- `#shaxsiy` - Shaxsiy hayot va fikrlar
-- `#kodlash` - Dasturlashga oid o'rganishlar
-- `#sport` - Sog'lom turmush tarzi
-EOF
+2. GitHub'da Yangi Repo ochish va Lokal Reponi Ulash
+GitHub bosh sahifasiga o'ting va New (yoki Create repository) tugmasini bosing.
 
-# O'zgarishni saqlash
+Repository nomini yozing (masalan: kundalik).
+
+DIQQAT: Add a README file, Add .gitignore bo'limlariga mutlaqo tegib o'tirmang (ular belgilangan bo'lsa, olib tashlang). Repo butunlay bo'sh bo'lishi kerak.
+
+Create repository tugmasini bosing.
+
+Sizga GitHub tomonidan SSH manzili beriladi (u git@github.com:login/repo.git ko'rinishida bo'ladi).
+
+Lokal reponi GitHub'ga bog'lash
+O'zingizning kompyuteringizdagi loyiha papkasiga (kundalik/) kirib, masofaviy server manzilini qo'shing:
+
+Bash
+# Masofaviy server manzilini 'origin' nomi bilan saqlash
+git remote add origin git@github.com:SIZNING_LOGIN/REPOS_NOMI.git
+
+# Birinchi marta push qilish (Lokal main branchini GitHub'ga bog'lash)
+git push -u origin main
+-u (upstream) flagi bir marta yoziladi. Keyingi safar Git qayerga push qilishni o'zi eslab qoladi.
+
+3. Kundalik Ish Oqimi (Workflow) va Qisqartirilgan Push
+Endi loyihada biror o'zgarish qilamiz:
+
+Bash
+echo "- Bugun GitHub bilan ishlashni o'rgandim" >> README.md
 git add README.md
-git commit -m "docs: README fayliga teglar tizimi qo'shildi"
-Branch'ni merge qilish va o'chirish
-Endi qilgan ishimizni asosiy (main) branchga birlashtiramiz va ortiqcha branchni o'chiramiz:
+git commit -m "docs: bugungi o'rganishlar yozildi"
+Endi -u flagisiz, shunchaki qisqa buyruq orqali kodni GitHub'ga yuboramiz:
 
 Bash
-git switch main
+git push
+4. Loyihani Boshqa Joyga Clone Qilish va Pull Olish
+Tasavvur qiling, siz uydagi kompyuterda ishni tugatdingiz va ofisdagi boshqa kompyuterda loyihani davom ettirmoqchisiz.
 
-# Merj qilish (Bu yerda Fast-forward sodir bo'ladi)
-git merge feature/teglar
-
-# Branch o'chirildi
-git branch -d feature/teglar
-3. 5 kunlik yozuvlar (8-12 iyun, 2026) va individual commitlar
-Har bir kun uchun alohida fayl yaratamiz va ularni alohida commit qilamiz:
+Clone (Nusxa olish)
+Boshqa ixtiyoriy papkaga o'tib, loyihani butunlay ko'chirib olasiz:
 
 Bash
-# 8-iyun yozuvi
-cp shablonlar/kun-shabloni.md 2026-06-08.md
-echo "- Bugun Git laboratoriyasini boshladim #kodlash" >> 2026-06-08.md
-git add 2026-06-08.md && git commit -m "docs(daily): 8-iyun yozuvi"
+git clone git@github.com:SIZNING_LOGIN/REPOS_NOMI.git
+Bu buyruq loyihaning barcha fayllari va Git tarixini yangi papka qilib yuklab beradi.
 
-# 9-iyun yozuvi
-cp shablonlar/kun-shabloni.md 2026-06-09.md
-echo "- Merge va Branchlar bilan ishladim #kodlash" >> 2026-06-09.md
-git add 2026-06-09.md && git commit -m "docs(daily): 9-iyun yozuvi"
-
-# 10-iyun yozuvi
-cp shablonlar/kun-shabloni.md 2026-06-10.md
-echo "- Bugun faqat dam oldim va kitob o'qidim #shaxsiy" >> 2026-06-10.md
-git add 2026-06-10.md && git commit -m "docs(daily): 10-iyun yozuvi"
-
-# 11-iyun yozuvi
-cp shablonlar/kun-shabloni.md 2026-06-11.md
-echo "- Ertalab 5 km yugurdim #sport" >> 2026-06-11.md
-git add 2026-06-11.md && git commit -m "docs(daily): 11-iyun yozuvi"
-
-# 12-iyun yozuvi
-cp shablonlar/kun-shabloni.md 2026-06-12.md
-echo "- Git tarixi tahlili ustida ishlayapman #kodlash" >> 2026-06-12.md
-git add 2026-06-12.md && git commit -m "docs(daily): 12-iyun yozuvi"
-4. git diff bilan o'zgarishlarni tekshirish
-Keling, 8-iyun kundaligiga qo'shimcha kiritamiz va hali commit qilinmagan o'zgarish qanday ko'rinishini tekshiramiz:
+Pull (Yangiliklarni olish)
+Agar loyiha kompyuteringizda allaqachon bor bo'lsa-yu, lekin GitHub'da kimdir (yoki o'zingiz boshqa joydan) yangi commit qo'shgan bo'lsa, o'sha o'zgarishlarni kompyuterga yuklash uchun foydalaniladi:
 
 Bash
-echo "- Kechki payt Git bo'yicha qo'shimcha maqola o'qidim" >> 2026-06-08.md
-
-# O'zgarishlarni ko'rish
-git diff 2026-06-08.md
-Natija konsolda quyidagicha ko'rinadi:
-
-Diff
-diff --git a/2026-06-08.md b/2026-06-08.md
-index 4b5c6d7..8e9f0a1 100644
---- a/2026-06-08.md
-+++ b/2026-06-08.md
-@@ -9,3 +9,4 @@
- ## 📋 Ertangi kun rejalari
- - 
- - Bugun Git laboratoriyasini boshladim #kodlash
-++ - Kechki payt Git bo'yicha qo'shimcha maqola o'qidim
-(Yashil rangdagi + belgisi yangi qo'shilgan qatorni anglatadi. Keling, buni ham saqlab qo'yamiz):
+git pull
+5. Feature Branch Yaratish va Masofaviy Serverga Push Qilish
+Yangi vazifa ustida ishlash uchun lokal kompyuterda yangi branch ochamiz:
 
 Bash
-git add 2026-06-08.md
-git commit -m "docs(daily): 8-iyun yozuviga qo'shimcha"
-5. Tarix Tahlili (Statistics & Blame)
-Loyihamizning umumiy holatini tahlil qilamiz.
+# Yangi feature branch yaratish va unga o'tish
+git switch -c feature/profile
 
-Jami commitlar sonini aniqlash:
-Bash
-git rev-list --count HEAD
-Hozirgi holatda natija: 9 chiqishi kerak.
-
-Eng katta o'zgarish (qaysi commitda eng ko'p qator qo'shilgan):
-Bizda shablon fayli yaratilganda yoki README tahrirlanganda katta o'zgarish bo'ldi. Statisikani qisqa ko'rish uchun:
+# Biror o'zgarish qilish
+echo "Foydalanuvchi profili bo'limi" > profile.md
+git add profile.md
+git commit -m "feat: profil sahifasi asosi yaratildi"
+Ushbu branch faqat bizning kompyuterimizda mavjud. Uni GitHub serverida ham ochish va kodni yuborish uchun quyidagi buyruqni bajaramiz:
 
 Bash
-git log --stat --oneline
-git blame natijasi:
-README.md faylining har bir qatorini kim va qachon yozganini ko'rish uchun:
-
-Bash
-git blame README.md
-Bu buyruq sizga har bir qator yonida commit ID'si va muallif ismini chiqarib beradi.
-
-6. .tmp Ignore Tizimi Ishlashini Tasdiqlash
-.gitignore faylimizga yozilgan *.tmp qoidasi to'g'ri ishlayotganini tekshirish uchun vaqtinchalik fayl yaratib ko'ramiz:
-
-Bash
-echo "Maxfiy yoki keraksiz kesh ma'lumotlar" > kesh-fayli.tmp
-
-# Git holatini tekshiramiz
-git status
-Natija:
-git status buyrug'ini berganingizda, kesh-fayli.tmp fayli "Untracked files" ro'yxatida ko'rinmaydi. Bu .gitignore qoidasi muvaffaqiyatli ishlayotganini va Git uni ataylab hisobga olmayotganini tasdiqlaydi.
+git push -u origin feature/profile
+Endi GitHub saytiga kirsangiz, u yerda ikkita branch (main va feature/profile) paydo bo'lganini va jamoangiz siz yozgan kodni ko'rib chiqishi (Pull Request) mumkinligini ko'rasiz.
